@@ -21,7 +21,7 @@ func main() {
 	var err error
 
 	// 💡 Configura esto con tu conexión real
-	dsn := "host=localhost user=postgres password=12345 dbname=imagenes port=5432 sslmode=disable"
+	dsn := "host=localhost user=apiuser password=1234 dbname=imagenes port=5432 sslmode=disable"
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("No se pudo conectar a la base de datos")
