@@ -33,10 +33,13 @@ func main() {
 
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"*"},
-		AllowMethods: []string{"GET", "POST"},
-		AllowHeaders: []string{"Content-Type"},
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
 	}))
+
 	// Sirve archivos estáticos desde la carpeta 'uploads'
 	r.Static("/uploads", "./uploads")
 	// Endpoint para subir imagen
