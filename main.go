@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -31,6 +32,11 @@ func main() {
 	db.AutoMigrate(&Imagen{})
 
 	r := gin.Default()
+	r.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{"GET", "POST"},
+		AllowHeaders: []string{"Content-Type"},
+	}))
 	// Sirve archivos estáticos desde la carpeta 'uploads'
 	r.Static("/uploads", "./uploads")
 	// Endpoint para subir imagen
