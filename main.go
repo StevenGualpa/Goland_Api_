@@ -31,7 +31,8 @@ func main() {
 	db.AutoMigrate(&Imagen{})
 
 	r := gin.Default()
-
+	// Sirve archivos estáticos desde la carpeta 'uploads'
+	r.Static("/uploads", "./uploads")
 	// Endpoint para subir imagen
 	r.POST("/imagenes", subirImagen)
 
