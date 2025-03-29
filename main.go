@@ -6,6 +6,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"net/http"
+	"time"
 )
 
 type Imagen struct {
@@ -21,40 +22,35 @@ var db *gorm.DB
 func main() {
 	var err error
 
-	// 💡 Configura esto con tu conexión real
 	dsn := "host=localhost user=apiuser password=1234 dbname=imagenes port=5432 sslmode=disable"
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("No se pudo conectar a la base de datos")
 	}
 
-	// Crear tabla automáticamente si no existe
 	db.AutoMigrate(&Imagen{})
 
-	r := gin.Default()
-	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
+	router := gin.Default()
+
+	// ✅ Configuración robusta de CORS
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"}, // o "http://127.0.0.1:5500" si quieres restringir
 		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
-		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
 	}))
 
-	// Soporte global para OPTIONS en todas las rutas
-	r.OPTIONS("/*path", func(c *gin.Context) {
+	// ✅ Soporte a OPTIONS para cualquier ruta
+	router.OPTIONS("/*path", func(c *gin.Context) {
 		c.AbortWithStatus(204)
 	})
 
-	// Sirve archivos estáticos desde la carpeta 'uploads'
-	r.Static("/uploads", "./uploads")
-	// Endpoint para subir imagen
-	r.POST("/imagenes", subirImagen)
+	router.Static("/uploads", "./uploads")
+	router.POST("/imagenes", subirImagen)
+	router.GET("/imagenes", listarImagenes)
 
-	// Endpoint para listar imágenes
-	r.GET("/imagenes", listarImagenes)
-
-	// Ejecutar en el puerto 8080
-	r.Run(":8080")
+	router.Run(":8080")
 }
 
 func subirImagen(c *gin.Context) {
@@ -82,7 +78,6 @@ func subirImagen(c *gin.Context) {
 	}
 
 	db.Create(&imagen)
-
 	c.JSON(http.StatusOK, imagen)
 }
 
