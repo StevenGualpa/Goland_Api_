@@ -40,6 +40,11 @@ func main() {
 		AllowCredentials: true,
 	}))
 
+	// Soporte global para OPTIONS en todas las rutas
+	r.OPTIONS("/*path", func(c *gin.Context) {
+		c.AbortWithStatus(204)
+	})
+
 	// Sirve archivos estáticos desde la carpeta 'uploads'
 	r.Static("/uploads", "./uploads")
 	// Endpoint para subir imagen
